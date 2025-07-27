@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>BLIP Image Captioning</title>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(to right, #ece9e6, #ffffff);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+    }
+
+    .container {
+      background-color: #fff;
+      max-width: 600px;
+      width: 100%;
+      padding: 30px;
+      border-radius: 15px;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+      text-align: center;
+      position: relative;
+    }
+
+    .logo {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      width: 60px;
+      height: auto;
+    }
+
+    h1 {
+      font-size: 28px;
+      color: #333;
+      margin-bottom: 10px;
+    }
+
+    p.description {
+      color: #666;
+      margin-bottom: 20px;
+    }
+
+    input[type="file"] {
+      margin: 15px 0;
+      font-size: 16px;
+    }
+
+    button {
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      padding: 12px 24px;
+      font-size: 16px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    button:hover {
+      background-color: #45a049;
+    }
+
+    .image-preview img {
+      max-width: 100%;
+      height: auto;
+      margin-top: 20px;
+      border-radius: 10px;
+      border: 1px solid #ddd;
+    }
+
+    .caption-box {
+      margin-top: 20px;
+      font-size: 18px;
+      color: #222;
+      font-style: italic;
+    }
+
+    footer {
+      margin-top: 30px;
+      font-size: 14px;
+      color: #888;
+    }
+
+    @media screen and (max-width: 640px) {
+      .container {
+        padding: 20px;
+      }
+
+      h1 {
+        font-size: 22px;
+      }
+
+      button {
+        width: 100%;
+        font-size: 14px;
+      }
+
+      .logo {
+        position: absolute;
+        top: 20px;
+        right: 20px;
+        height: 60px;
+      }
+
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="container">
+    <!-- 🔰 University logo -->
+    <img src="{{ url_for('static', filename='logo.png') }}" alt="University Logo" class="logo">
+
+
+    <h1>🧠 BLIP Image Captioning</h1>
+    <p class="description">Upload an image and get an AI-generated caption</p>
+
+    <form id="upload-form" enctype="multipart/form-data">
+      <input type="file" id="imageInput" name="image" accept="image/*" required>
+      <br><br>
+      <button type="submit">Generate Caption</button>
+    </form>
+
+
+    <div class="image-preview" id="imagePreview"></div>
+
+    <div class="caption-box" id="captionBox">Your caption will appear here...</div>
+
+    <footer>
+      Made with ❤️ by <strong>Tahir Ali</strong> |
+      📧 <a href="mailto:bsee23f28@gmail.com">bsee23f28@gmail.com</a><br>
+      If you would like a project like this, feel free to contact me.
+    </footer>
+    
+    
+  </div>
+
+  <script>
+    const form = document.getElementById("upload-form");
+    const imageInput = document.getElementById("imageInput");
+    const imagePreview = document.getElementById("imagePreview");
+    const captionBox = document.getElementById("captionBox");
+
+    form.addEventListener("submit", function (event) {
+      event.preventDefault();
+
+      const file = imageInput.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = function (e) {
+        imagePreview.innerHTML = `<img src="${e.target.result}" alt="Uploaded Image">`;
+      };
+      reader.readAsDataURL(file);
+
+      const formData = new FormData();
+      formData.append("image", file);
+
+      captionBox.innerText = "🤖 Generating caption...";
+
+      fetch("/caption", {
+        method: "POST",
+        body: formData
+      })
+        .then(res => res.json())
+        .then(data => {
+          captionBox.innerText = data.caption || "❌ Failed to generate caption.";
+        })
+        .catch(err => {
+          captionBox.innerText = "❌ Error: " + err.message;
+        });
+    });
+  </script>
+
+
+</body>
+
+</html>

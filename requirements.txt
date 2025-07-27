@@ -1,0 +1,11 @@
+# Flask framework for web application
+Flask==3.0.3
+
+# Transformers for loading BLIP model
+transformers==4.41.1
+
+# Pillow for image handling
+Pillow==10.3.0
+
+# PyTorch backend (required for transformers and BLIP)
+torch==2.3.0
